@@ -1150,14 +1150,18 @@ class App:
             else:
                 self.sidebar_visible = not self.sidebar_visible
         elif code in (curses.KEY_UP, ord("k")):
-            if self.focus == "toc" and self.toc_visible:
+            if self.search_hits:
+                self.find_prev()
+            elif self.focus == "toc" and self.toc_visible:
                 self.toc_index = max(0, self.toc_index - 1)
             elif self.sidebar_visible:
                 self.nav_index = max(0, self.nav_index - 1)
             else:
                 self.scroll_viewer(-1)
         elif code in (curses.KEY_DOWN, ord("j")):
-            if self.focus == "toc" and self.toc_visible:
+            if self.search_hits:
+                self.find_next()
+            elif self.focus == "toc" and self.toc_visible:
                 self.toc_index = min(max(0, len(self.toc) - 1), self.toc_index + 1)
             elif self.sidebar_visible:
                 self.nav_index = min(len(self.visible_tree()) - 1, self.nav_index + 1)
@@ -1184,6 +1188,9 @@ class App:
             term = prompt(self.stdscr, "Find: ")
             if term:
                 self.update_search(term)
+        elif code == ESC:
+            if self.search_hits:
+                self.clear_search()
         elif code == ord("n"):
             self.find_next()
         elif code == ord("t"):
