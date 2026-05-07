@@ -768,18 +768,37 @@ class App:
             return
         self.search_hit_index = (self.search_hit_index + 1) % len(self.search_hits)
         self.focus = "viewer"
-        self.view_scroll = max(0, self.search_hits[self.search_hit_index] - 2)
+        note, line_index = self.search_hits[self.search_hit_index]
+        if note is not self.current:
+            self.open_note(note)
+        self.view_scroll = max(0, line_index - 2)
         self.update_toc_for_view()
         self.status = f"Find: {self.search_term} ({self.search_hit_index + 1}/{len(self.search_hits)})"
 
     def update_search(self, term: str) -> None:
         self.search_term = term
-        lower = term.lower()
-        self.search_hits = [
-            index for index, line in enumerate(self.rendered) if lower and lower in line.text.lower()
-        ]
+        self.search_hits = collect_search_hits(self.vault.notes, term, self.render_markdown)
         self.search_hit_index = -1
         self.find_next()
+
+    def find_prev(self) -> None:
+        if not self.search_hits:
+            self.status = "No search hits"
+            return
+        self.search_hit_index = (self.search_hit_index - 1) % len(self.search_hits)
+        self.focus = "viewer"
+        note, line_index = self.search_hits[self.search_hit_index]
+        if note is not self.current:
+            self.open_note(note)
+        self.view_scroll = max(0, line_index - 2)
+        self.update_toc_for_view()
+        self.status = f"Find: {self.search_term} ({self.search_hit_index + 1}/{len(self.search_hits)})"
+
+    def clear_search(self) -> None:
+        self.search_term = ""
+        self.search_hits = []
+        self.search_hit_index = -1
+        self.status = "Search cleared"
 
     def draw(self) -> None:
         self.stdscr.erase()
