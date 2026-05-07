@@ -389,8 +389,9 @@ class App:
         if anchor:
             self.jump_to_anchor(anchor)
         self.nav_index = self.index_for_note(note)
-        self.search_hits = []
-        self.search_hit_index = -1
+        if not self.search_term:
+            self.search_hits = []
+            self.search_hit_index = -1
         self.status = f"Opened {note.rel}"
 
     def extract_page_links(self, note: Note) -> list[Note]:
