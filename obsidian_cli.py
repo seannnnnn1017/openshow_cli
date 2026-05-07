@@ -203,6 +203,23 @@ def offset_links(
     ]
 
 
+def collect_search_hits(
+    notes: list[Note],
+    term: str,
+    render_fn,
+) -> list[tuple[Note, int]]:
+    hits: list[tuple[Note, int]] = []
+    lower = term.lower()
+    if not lower:
+        return hits
+    for note in notes:
+        rendered = render_fn(note.raw)
+        for line_index, line in enumerate(rendered):
+            if lower in line.text.lower():
+                hits.append((note, line_index))
+    return hits
+
+
 def prompt(stdscr, message: str) -> str:
     height, width = stdscr.getmaxyx()
     curses.echo()
