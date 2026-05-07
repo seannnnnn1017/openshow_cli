@@ -5,6 +5,7 @@ import re
 import unicodedata
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Callable
 
 
 CTRL_E = 5
@@ -206,7 +207,7 @@ def offset_links(
 def collect_search_hits(
     notes: list[Note],
     term: str,
-    render_fn,
+    render_fn: Callable[[str], list[RenderLine]],
 ) -> list[tuple[Note, int]]:
     hits: list[tuple[Note, int]] = []
     lower = term.lower()
