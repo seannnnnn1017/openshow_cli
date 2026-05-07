@@ -333,7 +333,7 @@ class App:
         self.view_scroll = 0
         self.status = ""
         self.search_term = ""
-        self.search_hits: list[int] = []
+        self.search_hits: list[tuple[Note, int]] = []
         self.search_hit_index = -1
         self.toc: list[tuple[int, int, str]] = []
         self.toc_visible = True
@@ -855,6 +855,7 @@ class App:
         content_height = max(1, height - 1)
         self.viewer_content_height = content_height
         self.view_scroll = min(self.view_scroll, self.viewer_scroll_limit())
+        current_note_hit_lines = {li for (n, li) in self.search_hits if n is self.current}
         for offset in range(content_height):
             line_index = self.view_scroll + offset
             if line_index >= len(self.rendered):
@@ -887,7 +888,7 @@ class App:
             elif line.kind == "code":
                 gutter_attr = curses.A_DIM | viewer_bg
                 code_attr = curses.color_pair(3)
-                if line_index in self.search_hits:
+                if line_index in current_note_hit_lines:
                     code_attr |= curses.A_REVERSE
                 text = line.text
                 second_bar = text.find("│", 1)
@@ -923,7 +924,7 @@ class App:
                 attr = curses.color_pair(4)
             elif line.kind == "rule":
                 attr = curses.A_DIM | viewer_bg
-            if line_index in self.search_hits:
+            if line_index in current_note_hit_lines:
                 attr |= curses.A_REVERSE
             text = line.text
             safe_addstr(self.stdscr, content_top + offset, left + 1, text[: max(1, width - 2)], attr)
