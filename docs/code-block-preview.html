@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>Code Block 風格預覽</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #111;
+    color: #ccc;
+    font-family: 'Cascadia Code', 'JetBrains Mono', monospace;
+    font-size: 14px;
+    padding: 32px;
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+  }
+
+  .col { display: flex; flex-direction: column; gap: 24px; }
+  .label { color: #556; font-size: 11px; margin-bottom: 6px; letter-spacing: 0.08em; text-transform: uppercase; }
+
+  /* Terminal mock */
+  .terminal {
+    background: #0f1630;
+    border-radius: 6px;
+    padding: 16px 18px;
+    min-width: 520px;
+    line-height: 1.6;
+    font-size: 13.5px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  }
+
+  /* ── Code block styles ────────────────────────── */
+
+  /* Option A: full box */
+  .code-box {
+    border: 1px solid #2a3a60;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 6px 0;
+  }
+  .code-header {
+    background: #131d3a;
+    border-bottom: 1px solid #2a3a60;
+    padding: 3px 10px;
+    display: flex;
+    justify-content: space-between;
+    color: #5f87af;
+    font-size: 12px;
+  }
+  .code-header .lang { color: #87afd7; font-weight: 600; }
+  .code-header .meta { color: #3a5070; }
+  .code-body { padding: 6px 0; }
+  .code-line {
+    display: flex;
+    align-items: baseline;
+    padding: 0 0 0 0;
+  }
+  .ln {
+    min-width: 36px;
+    text-align: right;
+    padding-right: 8px;
+    color: #2e4060;
+    user-select: none;
+    font-size: 12px;
+  }
+  .sep { color: #2a3a60; margin-right: 10px; }
+  .code-content { color: #87d787; white-space: pre; }
+
+  /* Option B: lighter left-bar only */
+  .code-bar {
+    border-left: 2px solid #2a3a60;
+    margin: 6px 0 6px 2px;
+    padding: 4px 0;
+  }
+  .code-bar .code-line { padding: 0; }
+  .code-bar .ln { color: #2e4060; min-width: 32px; }
+  .code-bar .sep { color: #2a3a60; }
+
+  /* Shared tokens */
+  .kw  { color: #af87ff; }   /* keywords */
+  .str { color: #afd75f; }   /* strings */
+  .num { color: #d7875f; }   /* numbers */
+  .cmt { color: #3a5070; }   /* comments */
+  .fn  { color: #87d787; }   /* builtins */
+  .op  { color: #5fd7ff; }   /* operators */
+  .txt { color: #87d787; }   /* plain code */
+
+  .plain { color: #c8d0e0; }
+</style>
+</head>
+<body>
+
+<!-- ── Option A: Full Box ──────────── -->
+<div class="col">
+  <div>
+    <div class="label">A · 完整外框 + 標題列</div>
+    <div class="terminal">
+
+      <div class="plain" style="color:#5fd7ff;font-weight:bold;margin-bottom:8px;"># Hash Table</div>
+      <div class="plain" style="margin-bottom:10px;">Python 的 dict 是典型實作。</div>
+
+      <div class="code-box">
+        <div class="code-header">
+          <span class="lang">python</span>
+          <span class="meta">8 lines</span>
+        </div>
+        <div class="code-body">
+          <div class="code-line"><span class="ln">1</span><span class="sep">│</span><span class="code-content"><span class="kw">def </span><span class="txt">quicksort</span><span class="op">(</span><span class="txt">arr</span><span class="op">):</span></span></div>
+          <div class="code-line"><span class="ln">2</span><span class="sep">│</span><span class="code-content">    <span class="kw">if </span><span class="fn">len</span><span class="op">(</span><span class="txt">arr</span><span class="op">) &lt;= </span><span class="num">1</span><span class="op">:</span></span></div>
+          <div class="code-line"><span class="ln">3</span><span class="sep">│</span><span class="code-content">        <span class="kw">return </span><span class="txt">arr</span></span></div>
+          <div class="code-line"><span class="ln">4</span><span class="sep">│</span><span class="code-content">    <span class="txt">pivot </span><span class="op">= </span><span class="txt">arr</span><span class="op">[</span><span class="fn">len</span><span class="op">(</span><span class="txt">arr</span><span class="op">) // </span><span class="num">2</span><span class="op">]</span></span></div>
+          <div class="code-line"><span class="ln">5</span><span class="sep">│</span><span class="code-content">    <span class="txt">left  </span><span class="op">= [</span><span class="txt">x </span><span class="kw">for </span><span class="txt">x </span><span class="kw">in </span><span class="txt">arr </span><span class="kw">if </span><span class="txt">x </span><span class="op">&lt; </span><span class="txt">pivot</span><span class="op">]</span></span></div>
+          <div class="code-line"><span class="ln">6</span><span class="sep">│</span><span class="code-content">    <span class="txt">mid   </span><span class="op">= [</span><span class="txt">x </span><span class="kw">for </span><span class="txt">x </span><span class="kw">in </span><span class="txt">arr </span><span class="kw">if </span><span class="txt">x </span><span class="op">== </span><span class="txt">pivot</span><span class="op">]</span></span></div>
+          <div class="code-line"><span class="ln">7</span><span class="sep">│</span><span class="code-content">    <span class="txt">right </span><span class="op">= [</span><span class="txt">x </span><span class="kw">for </span><span class="txt">x </span><span class="kw">in </span><span class="txt">arr </span><span class="kw">if </span><span class="txt">x </span><span class="op">&gt; </span><span class="txt">pivot</span><span class="op">]</span></span></div>
+          <div class="code-line"><span class="ln">8</span><span class="sep">│</span><span class="code-content">    <span class="kw">return </span><span class="txt">quicksort</span><span class="op">(</span><span class="txt">left</span><span class="op">) + </span><span class="txt">mid </span><span class="op">+ </span><span class="txt">quicksort</span><span class="op">(</span><span class="txt">right</span><span class="op">)</span></span></div>
+        </div>
+      </div>
+
+      <div class="plain" style="margin-top:10px;">短範例：</div>
+
+      <div class="code-box" style="margin-top:6px">
+        <div class="code-header">
+          <span class="lang">python</span>
+          <span class="meta">3 lines</span>
+        </div>
+        <div class="code-body">
+          <div class="code-line"><span class="ln">1</span><span class="sep">│</span><span class="code-content"><span class="txt">table </span><span class="op">= {}</span></span></div>
+          <div class="code-line"><span class="ln">2</span><span class="sep">│</span><span class="code-content"><span class="txt">table</span><span class="op">[</span><span class="str">'name'</span><span class="op">] = </span><span class="str">'sean'</span></span></div>
+          <div class="code-line"><span class="ln">3</span><span class="sep">│</span><span class="code-content"><span class="fn">print</span><span class="op">(</span><span class="txt">table</span><span class="op">)</span></span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── Option B: Left-bar only ──────── -->
+<div class="col">
+  <div>
+    <div class="label">B · 左側 bar + 行號（無外框）</div>
+    <div class="terminal">
+
+      <div class="plain" style="color:#5fd7ff;font-weight:bold;margin-bottom:8px;"># Hash Table</div>
+      <div class="plain" style="margin-bottom:6px;">Python 的 dict 是典型實作。</div>
+
+      <div style="color:#3a5070;font-size:12px;margin-bottom:2px;">── python · 8 lines ────────────</div>
+      <div class="code-bar">
+        <div class="code-line"><span class="ln">1</span><span class="sep">│</span><span class="code-content"><span class="kw">def </span><span class="txt">quicksort</span><span class="op">(</span><span class="txt">arr</span><span class="op">):</span></span></div>
+        <div class="code-line"><span class="ln">2</span><span class="sep">│</span><span class="code-content">    <span class="kw">if </span><span class="fn">len</span><span class="op">(</span><span class="txt">arr</span><span class="op">) &lt;= </span><span class="num">1</span><span class="op">:</span></span></div>
+        <div class="code-line"><span class="ln">3</span><span class="sep">│</span><span class="code-content">        <span class="kw">return </span><span class="txt">arr</span></span></div>
+        <div class="code-line"><span class="ln">4</span><span class="sep">│</span><span class="code-content">    <span class="txt">pivot </span><span class="op">= </span><span class="txt">arr</span><span class="op">[</span><span class="fn">len</span><span class="op">(</span><span class="txt">arr</span><span class="op">) // </span><span class="num">2</span><span class="op">]</span></span></div>
+        <div class="code-line"><span class="ln">5</span><span class="sep">│</span><span class="code-content">    <span class="txt">left  </span><span class="op">= [</span><span class="txt">x </span><span class="kw">for </span><span class="txt">x </span><span class="kw">in </span><span class="txt">arr </span><span class="kw">if </span><span class="txt">x </span><span class="op">&lt; </span><span class="txt">pivot</span><span class="op">]</span></span></div>
+        <div class="code-line"><span class="ln">6</span><span class="sep">│</span><span class="code-content">    <span class="txt">mid   </span><span class="op">= [</span><span class="txt">x </span><span class="kw">for </span><span class="txt">x </span><span class="kw">in </span><span class="txt">arr </span><span class="kw">if </span><span class="txt">x </span><span class="op">== </span><span class="txt">pivot</span><span class="op">]</span></span></div>
+        <div class="code-line"><span class="ln">7</span><span class="sep">│</span><span class="code-content">    <span class="txt">right </span><span class="op">= [</span><span class="txt">x </span><span class="kw">for </span><span class="txt">x </span><span class="kw">in </span><span class="txt">arr </span><span class="kw">if </span><span class="txt">x </span><span class="op">&gt; </span><span class="txt">pivot</span><span class="op">]</span></span></div>
+        <div class="code-line"><span class="ln">8</span><span class="sep">│</span><span class="code-content">    <span class="kw">return </span><span class="txt">quicksort</span><span class="op">(</span><span class="txt">left</span><span class="op">) + </span><span class="txt">mid </span><span class="op">+ </span><span class="txt">quicksort</span><span class="op">(</span><span class="txt">right</span><span class="op">)</span></span></div>
+      </div>
+
+      <div style="color:#3a5070;font-size:12px;margin-top:10px;margin-bottom:2px;">── python · 3 lines ────────────</div>
+      <div class="code-bar">
+        <div class="code-line"><span class="ln">1</span><span class="sep">│</span><span class="code-content"><span class="txt">table </span><span class="op">= {}</span></span></div>
+        <div class="code-line"><span class="ln">2</span><span class="sep">│</span><span class="code-content"><span class="txt">table</span><span class="op">[</span><span class="str">'name'</span><span class="op">] = </span><span class="str">'sean'</span></span></div>
+        <div class="code-line"><span class="ln">3</span><span class="sep">│</span><span class="code-content"><span class="fn">print</span><span class="op">(</span><span class="txt">table</span><span class="op">)</span></span></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── Option C: Unicode box (terminal-native) ── -->
+<div class="col">
+  <div>
+    <div class="label">C · Unicode 框線（純終端機字元）</div>
+    <div class="terminal">
+
+      <div class="plain" style="color:#5fd7ff;font-weight:bold;margin-bottom:8px;"># Hash Table</div>
+      <div class="plain" style="margin-bottom:6px;">Python 的 dict 是典型實作。</div>
+
+      <div style="color:#2a3a60;white-space:pre;margin:4px 0;">┌─<span style="color:#5f87af"> python </span><span style="color:#2e4060">· 8 lines </span><span style="color:#2a3a60">──────────────┐</span></div>
+      <div style="color:#87d787;white-space:pre;"><span style="color:#2a3a60">│</span><span style="color:#2e4060"> 1 </span><span style="color:#2a3a60">│</span> <span class="kw">def </span><span>quicksort</span><span class="op">(</span><span>arr</span><span class="op">):</span>            <span style="color:#2a3a60">│</span></div>
+      <div style="color:#87d787;white-space:pre;"><span style="color:#2a3a60">│</span><span style="color:#2e4060"> 2 </span><span style="color:#2a3a60">│</span>     <span class="kw">if </span><span class="fn">len</span><span class="op">(</span><span>arr</span><span class="op">) &lt;= </span><span class="num">1</span><span class="op">:</span>           <span style="color:#2a3a60">│</span></div>
+      <div style="color:#87d787;white-space:pre;"><span style="color:#2a3a60">│</span><span style="color:#2e4060"> 3 </span><span style="color:#2a3a60">│</span>         <span class="kw">return </span><span>arr</span>              <span style="color:#2a3a60">│</span></div>
+      <div style="color:#87d787;white-space:pre;"><span style="color:#2a3a60">│</span><span style="color:#2e4060"> 4 </span><span style="color:#2a3a60">│</span>     <span>pivot </span><span class="op">=</span> <span>arr</span><span class="op">[</span><span class="fn">len</span><span class="op">(</span><span>arr</span><span class="op">) // </span><span class="num">2</span><span class="op">]</span>  <span style="color:#2a3a60">│</span></div>
+      <div style="color:#87d787;white-space:pre;"><span style="color:#2a3a60">│</span><span style="color:#2e4060"> 5 </span><span style="color:#2a3a60">│</span>     <span>left  </span><span class="op">= [</span><span>x </span><span class="kw">for </span><span>x </span><span class="kw">in </span><span>arr</span><span class="op">…</span>   <span style="color:#2a3a60">│</span></div>
+      <div style="color:#87d787;white-space:pre;"><span style="color:#2a3a60">│</span><span style="color:#2e4060"> 6 </span><span style="color:#2a3a60">│</span>     <span>mid   </span><span class="op">= [</span><span>x </span><span class="kw">for </span><span>x </span><span class="kw">in </span><span>arr</span><span class="op">…</span>   <span style="color:#2a3a60">│</span></div>
+      <div style="color:#87d787;white-space:pre;"><span style="color:#2a3a60">│</span><span style="color:#2e4060"> 7 </span><span style="color:#2a3a60">│</span>     <span>right </span><span class="op">= [</span><span>x </span><span class="kw">for </span><span>x </span><span class="kw">in </span><span>arr</span><span class="op">…</span>   <span style="color:#2a3a60">│</span></div>
+      <div style="color:#87d787;white-space:pre;"><span style="color:#2a3a60">│</span><span style="color:#2e4060"> 8 </span><span style="color:#2a3a60">│</span>     <span class="kw">return </span><span>quicksort</span><span class="op">(…) +</span> <span>…</span>    <span style="color:#2a3a60">│</span></div>
+      <div style="color:#2a3a60;white-space:pre;">└──────────────────────────────────┘</div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
