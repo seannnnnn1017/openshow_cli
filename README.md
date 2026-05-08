@@ -1,20 +1,21 @@
 # ShowMD
 
-ShowMD is a terminal Markdown vault viewer for browsing local notes with wiki links, backlinks, themes, live refresh, editing, and graph navigation.
+ShowMD is a terminal document viewer for browsing Markdown vaults, text files, code files, and notebooks with wiki links, backlinks, themes, live refresh, editing, and graph navigation.
 
 It is designed for small Markdown knowledge bases and Obsidian-style folders, while staying lightweight enough to run as a single Python curses application.
 
 ## Features
 
-- Browse a Markdown vault with a tree-style sidebar
+- Browse a Markdown vault or a general document directory with a tree-style sidebar
+- Open individual Markdown, text, code, and `.ipynb` files directly
 - Render Markdown headings, lists, tables, blockquotes, code blocks, and frontmatter
 - Follow Obsidian-style wiki links such as `[[note]]`, `[[note#Heading]]`, and `[[note|Label]]`
 - View page links, backlinks, and a table of contents
-- Search across notes
-- Edit notes in the terminal
-- Auto-refresh when Markdown files are changed externally
+- Search across documents
+- Edit Markdown, text, and code files in the terminal
+- Auto-refresh when supported documents are changed externally
 - Switch themes from an in-app tab selector
-- Use one-level and two-level graph views centered on the current note
+- Use one-level and two-level graph views centered on the current document
 - Install as a terminal command named `showmd`
 
 ## Requirements
@@ -38,7 +39,7 @@ npm install -g .
 Then run:
 
 ```bash
-showmd database
+showmd
 ```
 
 The npm package is a thin wrapper around the Python app. It avoids Python package installation issues on Debian/Ubuntu systems with externally managed Python environments.
@@ -47,7 +48,7 @@ The npm package is a thin wrapper around the Python app. It avoids Python packag
 
 ```bash
 pipx install -e .
-showmd database
+showmd
 ```
 
 ### Python editable install
@@ -58,7 +59,7 @@ Use this inside a virtual environment:
 python3 -m venv .venv
 . .venv/bin/activate
 python -m pip install -e .
-showmd database
+showmd
 ```
 
 ### Development without install
@@ -69,16 +70,31 @@ python3 obsidian_cli.py database
 
 ## Usage
 
-Open the bundled demo vault:
+Open the current directory:
 
 ```bash
-showmd database
+showmd
+```
+
+Open the bundled mixed-document demo:
+
+```bash
+showmd demo
 ```
 
 Open another Markdown vault:
 
 ```bash
 showmd /path/to/your/vault
+```
+
+Open a single file directly:
+
+```bash
+showmd README.md
+showmd notes.txt
+showmd app.py
+showmd analysis.ipynb
 ```
 
 Start with a specific theme:
@@ -148,12 +164,13 @@ upstream sources -> backlinks -> current note -> links -> downstream notes
 This mode is useful for seeing how a note is connected to its immediate context. If the graph is taller than the terminal, it scrolls automatically to keep the selected item visible.
 
 The bundled vault includes `database/demo_project/graph-center.md` as a purpose-built graph demo.
+The `demo/` folder is a smaller mixed-document workspace with Markdown, Python, notebook, and plain text files.
 
 ## Live Refresh
 
-ShowMD checks the vault for external changes once per second. The check is intentionally lightweight: it only compares each Markdown file's relative path, modification timestamp, and file size.
+ShowMD checks the opened directory or file for external changes once per second. The check is intentionally lightweight: it only compares each supported document's relative path, modification timestamp, and file size.
 
-When a change is detected, ShowMD reloads the vault, refreshes the sidebar, updates links and backlinks, and re-renders the current note if it still exists.
+When a change is detected, ShowMD reloads the document set, refreshes the sidebar, updates links and backlinks, and re-renders the current document if it still exists.
 
 Live refresh is paused while editing inside ShowMD to avoid disrupting unsaved changes.
 
@@ -181,7 +198,7 @@ The `database/` directory contains an English sample vault with:
 Run it with:
 
 ```bash
-showmd database
+showmd demo
 ```
 
 ## Packaging

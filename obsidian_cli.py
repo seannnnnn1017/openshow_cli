@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import curses
+import json
 import re
 import time
 import unicodedata
@@ -20,6 +21,15 @@ WIKI_LINK_RE = re.compile(r"\[\[([^\]|#]+)?(?:#([^\]|]+))?(?:\|([^\]]+))?\]\]")
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$")
 HR_RE = re.compile(r"^\s{0,3}([-*_])(?:\s*\1){2,}\s*$")
 VAULT_POLL_SECONDS = 1.0
+MARKDOWN_EXTENSIONS = {".md", ".markdown", ".mdown", ".mkd"}
+TEXT_EXTENSIONS = {".txt", ".text", ".log", ".csv", ".tsv", ".json", ".yaml", ".yml", ".toml", ".xml"}
+CODE_EXTENSIONS = {
+    ".bash", ".c", ".cc", ".cpp", ".cs", ".css", ".go", ".h", ".hpp", ".html",
+    ".java", ".js", ".jsx", ".kt", ".lua", ".php", ".pl", ".py", ".r", ".rb",
+    ".rs", ".scala", ".scss", ".sh", ".sql", ".swift", ".tsx", ".ts", ".vue",
+}
+NOTEBOOK_EXTENSIONS = {".ipynb"}
+SUPPORTED_FILE_EXTENSIONS = MARKDOWN_EXTENSIONS | TEXT_EXTENSIONS | CODE_EXTENSIONS | NOTEBOOK_EXTENSIONS
 
 
 @dataclass
@@ -30,6 +40,8 @@ class Note:
     title: str
     raw: str = ""
     body: str = ""
+    kind: str = "markdown"
+    editable: bool = True
 
 
 @dataclass
@@ -121,16 +133,28 @@ THEME_ORDER = list(THEMES)
 
 
 class Vault:
-    def __init__(self, root: Path):
-        self.root = root.resolve()
+    def __init__(self, source: Path):
+        self.source = source.resolve()
+        self.single_file = self.source.is_file()
+        self.root = self.source.parent if self.single_file else self.source
+        self.display_name = self.source.name if self.single_file else f"{self.source.name}/"
         self.notes: list[Note] = []
         self.by_stem: dict[str, Note] = {}
         self.by_rel: dict[str, Note] = {}
         self.reload()
 
+    def iter_document_paths(self) -> list[Path]:
+        if self.single_file:
+            return [self.source]
+        return [
+            path
+            for path in sorted(self.root.rglob("*"))
+            if path.is_file() and is_supported_document(path)
+        ]
+
     def signature(self) -> tuple[tuple[str, int, int], ...]:
         items: list[tuple[str, int, int]] = []
-        for path in sorted(self.root.rglob("*.md")):
+        for path in self.iter_document_paths():
             try:
                 stat = path.stat()
             except OSError:
@@ -144,11 +168,10 @@ class Vault:
         self.by_stem.clear()
         self.by_rel.clear()
 
-        for path in sorted(self.root.rglob("*.md")):
-            raw = path.read_text(encoding="utf-8")
-            body = strip_frontmatter(raw)
+        for path in self.iter_document_paths():
+            raw, body, kind, editable = read_document(path)
             rel = path.relative_to(self.root).as_posix()
-            stem_rel = rel[:-3]
+            stem_rel = Path(rel).with_suffix("").as_posix()
             note = Note(
                 path=path,
                 rel=rel,
@@ -156,6 +179,8 @@ class Vault:
                 title=extract_title(body, stem_rel),
                 raw=raw,
                 body=body,
+                kind=kind,
+                editable=editable,
             )
             self.notes.append(note)
             self.by_rel[rel.lower()] = note
@@ -165,8 +190,14 @@ class Vault:
     def resolve_link(self, target: str | None) -> Note | None:
         if not target:
             return None
-        clean = target.strip().removesuffix(".md").lower()
-        return self.by_stem.get(clean) or self.by_rel.get(f"{clean}.md")
+        clean = target.strip().replace("\\", "/").lower()
+        stem = Path(clean).with_suffix("").as_posix() if Path(clean).suffix else clean
+        return (
+            self.by_rel.get(clean)
+            or self.by_stem.get(stem)
+            or self.by_stem.get(Path(stem).name)
+            or self.by_rel.get(f"{stem}.md")
+        )
 
     def default_note(self) -> Note | None:
         return self.resolve_link("index") or (self.notes[0] if self.notes else None)
@@ -185,6 +216,82 @@ class Vault:
                     items.append(TreeItem(part, key, depth, True))
             items.append(TreeItem(parts[-1], note.rel, len(parts) - 1, False, note))
         return items
+
+
+def is_supported_document(path: Path) -> bool:
+    return path.suffix.lower() in SUPPORTED_FILE_EXTENSIONS
+
+
+def read_text_document(path: Path) -> str:
+    return path.read_text(encoding="utf-8", errors="replace")
+
+
+def source_lines(source) -> list[str]:
+    if isinstance(source, list):
+        return [str(part) for part in source]
+    if isinstance(source, str):
+        return source.splitlines(keepends=True)
+    return []
+
+
+def notebook_outputs_text(outputs: list[dict]) -> list[str]:
+    lines: list[str] = []
+    for output in outputs:
+        output_type = output.get("output_type", "output")
+        if output_type == "stream":
+            text = output.get("text", "")
+        elif output_type in ("execute_result", "display_data"):
+            data = output.get("data", {})
+            text = data.get("text/plain", "")
+        elif output_type == "error":
+            traceback = output.get("traceback")
+            text = traceback if traceback else [output.get("ename", "Error"), output.get("evalue", "")]
+        else:
+            text = ""
+        rendered = "".join(source_lines(text)).strip("\n")
+        if rendered:
+            lines.extend(rendered.splitlines())
+    return lines
+
+
+def notebook_to_markdown(path: Path) -> str:
+    try:
+        data = json.loads(read_text_document(path))
+    except (OSError, json.JSONDecodeError) as exc:
+        return f"# {path.name}\n\nCould not parse notebook: {exc}\n"
+
+    chunks: list[str] = [f"# {path.name}"]
+    for index, cell in enumerate(data.get("cells", []), start=1):
+        cell_type = cell.get("cell_type", "cell")
+        lines = source_lines(cell.get("source", []))
+        source = "".join(lines).rstrip("\n")
+        if cell_type == "markdown":
+            if source:
+                chunks.append(source)
+        elif cell_type == "code":
+            execution_count = cell.get("execution_count")
+            label = f"python input {execution_count}" if execution_count is not None else "python input"
+            chunks.append(f"```{label}\n{source}\n```")
+            outputs = notebook_outputs_text(cell.get("outputs", []))
+            if outputs:
+                chunks.append("```text output\n" + "\n".join(outputs) + "\n```")
+        else:
+            if source:
+                chunks.append(f"```text {cell_type} {index}\n{source}\n```")
+    return "\n\n".join(chunks).rstrip() + "\n"
+
+
+def read_document(path: Path) -> tuple[str, str, str, bool]:
+    suffix = path.suffix.lower()
+    if suffix in NOTEBOOK_EXTENSIONS:
+        raw = notebook_to_markdown(path)
+        return raw, raw, "notebook", False
+    raw = read_text_document(path)
+    if suffix in CODE_EXTENSIONS:
+        return raw, raw, "code", True
+    if suffix in TEXT_EXTENSIONS:
+        return raw, raw, "text", True
+    return raw, strip_frontmatter(raw), "markdown", True
 
 
 def strip_frontmatter(raw: str) -> str:
@@ -282,13 +389,14 @@ def collect_search_hits(
     notes: list[Note],
     term: str,
     render_fn: Callable[[str], list[RenderLine]],
+    render_note_fn: Callable[[Note], list[RenderLine]] | None = None,
 ) -> list[tuple[Note, int]]:
     hits: list[tuple[Note, int]] = []
     lower = term.lower()
     if not lower:
         return hits
     for note in notes:
-        rendered = render_fn(note.raw)
+        rendered = render_note_fn(note) if render_note_fn else render_fn(note.raw)
         for line_index, line in enumerate(rendered):
             if lower in line.text.lower():
                 hits.append((note, line_index))
@@ -505,13 +613,12 @@ class App:
 
     def open_note(self, note: Note | None, anchor: str | None = None) -> None:
         if not note:
-            self.status = "No markdown notes found"
+            self.status = "No supported documents found"
             return
         self.expand_note_parents(note)
         self.current = note
-        note.raw = note.path.read_text(encoding="utf-8")
-        note.body = strip_frontmatter(note.raw)
-        self.rendered = self.render_markdown(note.raw)
+        note.raw, note.body, note.kind, note.editable = read_document(note.path)
+        self.rendered = self.render_note(note)
         self.toc = self.extract_toc()
         self.page_links = self.extract_page_links(note)
         self.page_backlinks = self.extract_backlinks(note)
@@ -762,6 +869,14 @@ class App:
         out.append(RenderLine("", "code_bottom", source + n + 1))
         return out
 
+    def render_note(self, note: Note) -> list[RenderLine]:
+        if note.kind == "code":
+            lang = note.path.suffix.lower().lstrip(".") or "text"
+            return self._render_code_block(lang, note.raw.splitlines(), 0)
+        if note.kind == "text":
+            return [RenderLine(line, "text", index) for index, line in enumerate(note.raw.splitlines())]
+        return self.render_markdown(note.raw)
+
     def render_markdown(self, raw: str) -> list[RenderLine]:
         result: list[RenderLine] = []
         frontmatter, body = split_frontmatter(raw)
@@ -953,7 +1068,7 @@ class App:
 
     def update_search(self, term: str) -> None:
         self.search_term = term
-        self.search_hits = collect_search_hits(self.vault.notes, term, self.render_markdown)
+        self.search_hits = collect_search_hits(self.vault.notes, term, self.render_markdown, self.render_note)
         self.search_hit_index = -1
         self.find_next()
 
@@ -1022,7 +1137,7 @@ class App:
         self.stdscr.refresh()
 
     def draw_sidebar(self, top: int, left: int, height: int, width: int) -> None:
-        root_label = f" {self.vault.root.name}/"
+        root_label = f" {self.vault.display_name}"
         safe_addstr(self.stdscr, top, left, root_label.ljust(width - 1), curses.A_REVERSE)
         visible_tree = self.visible_tree()
         visible_height = max(1, height - 1)
@@ -1252,8 +1367,7 @@ class App:
         safe_addstr(self.stdscr, panel_y, panel_x,
                     "┌" + "─" * inner_w + "┐", viewer_bg)
         # Title row
-        vault_name = self.vault.root.name
-        title_text = f" 📂 {vault_name}/ "
+        title_text = f" 📂 {self.vault.display_name} "
         safe_addstr(self.stdscr, panel_y + 1, panel_x,
                     "│" + visual_ljust(truncate_to_display_width(title_text, inner_w), inner_w) + "│",
                     curses.A_BOLD | viewer_bg)
@@ -1941,8 +2055,11 @@ class App:
     def start_edit(self) -> None:
         if not self.current:
             return
+        if not self.current.editable:
+            self.status = f"{self.current.rel} is view-only in ShowMD"
+            return
         self.mode = "edit"
-        self.edit_lines = self.current.raw.splitlines()
+        self.edit_lines = read_text_document(self.current.path).splitlines()
         if not self.edit_lines:
             self.edit_lines = [""]
         self.edit_y = min(self.view_scroll, len(self.edit_lines) - 1)
@@ -2024,8 +2141,13 @@ class App:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(prog="showmd", description="Terminal markdown vault viewer")
-    parser.add_argument("vault", nargs="?", default="database", help="Markdown vault directory")
+    parser = argparse.ArgumentParser(prog="showmd", description="Terminal document and Markdown vault viewer")
+    parser.add_argument(
+        "target",
+        nargs="?",
+        default=".",
+        help="File or directory to open (default: current directory)",
+    )
     parser.add_argument(
         "--theme",
         choices=THEME_ORDER,
@@ -2033,10 +2155,12 @@ def main() -> None:
         help="UI theme to use at startup",
     )
     args = parser.parse_args()
-    vault = Path(args.vault)
-    if not vault.exists() or not vault.is_dir():
-        raise SystemExit(f"Vault directory not found: {vault}")
-    curses.wrapper(lambda stdscr: App(stdscr, vault, args.theme).run())
+    target = Path(args.target)
+    if not target.exists():
+        raise SystemExit(f"Path not found: {target}")
+    if not target.is_file() and not target.is_dir():
+        raise SystemExit(f"Path is not a file or directory: {target}")
+    curses.wrapper(lambda stdscr: App(stdscr, target, args.theme).run())
 
 
 if __name__ == "__main__":

@@ -1,0 +1,8 @@
+# Demo runtime artifacts
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Keep generated outputs local while preserving this directory.
+output/*
+!output/.gitkeep
