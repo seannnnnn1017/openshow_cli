@@ -1,56 +1,53 @@
 ---
-title: 待辦事項專案
+title: Todo App
 tags: [project, python, cli]
 created: 2026-05-05
 status: in-progress
 ---
 
-# 待辦事項專案
+# Todo App
 
-回到 [[index]]
+Back to [[index]].
 
-## 概述
+This project is a small command-line task manager written in [[python-basics|Python]].
 
-一個用 [[python-basics|Python]] 撰寫的命令列 Todo 工具。
+## Goals
 
-## 技術選擇
+- Store tasks locally
+- List tasks in priority order
+- Mark tasks as complete
+- Keep the command syntax predictable
 
-- 語言：Python（見 [[python-basics]]）
-- 儲存：JSON 檔案（利用 [[data-structures#Hash Table]] 結構）
-- 排序：依優先度排序（參考 [[algorithms#排序]]）
+## Technical Choices
 
-## 核心功能
+- Language: [[python-basics]]
+- Storage: JSON files backed by a [[data-structures#Hash Table]]
+- Sorting: priority sort inspired by [[algorithms#Sorting]]
+- Interface: command patterns from [[patterns/cli-design]]
+- Validation: defensive checks from [[patterns/error-handling]]
 
-- [ ] 新增任務
-- [ ] 刪除任務
-- [x] 列出所有任務
-- [ ] 標記完成
-
-## 程式碼草稿
+## Draft Data Model
 
 ```python
-import json
-from pathlib import Path
+from dataclasses import dataclass
 
-DB_PATH = Path("tasks.json")
-
-def load_tasks() -> dict:
-    if DB_PATH.exists():
-        return json.loads(DB_PATH.read_text())
-    return {}
-
-def save_tasks(tasks: dict) -> None:
-    DB_PATH.write_text(json.dumps(tasks, ensure_ascii=False, indent=2))
-
-def add_task(title: str, priority: int = 0) -> None:
-    tasks = load_tasks()
-    task_id = str(len(tasks) + 1)
-    tasks[task_id] = {"title": title, "priority": priority, "done": False}
-    save_tasks(tasks)
+@dataclass
+class Task:
+    title: str
+    priority: int = 0
+    done: bool = False
 ```
 
-## 相關筆記
+## Command Examples
 
-- [[python-basics]] - 使用的語言基礎
-- [[data-structures]] - 資料儲存方式
-- [[algorithms]] - 排序邏輯
+```text
+todo add "Write graph view" --priority 2
+todo list --open
+todo done 3
+```
+
+## Related Notes
+
+- [[projects/notes-indexer]] - Another CLI project with file scanning
+- [[concepts/testing]] - Testing command behavior
+- [[patterns/refactoring]] - Keeping the command handlers small

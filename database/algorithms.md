@@ -1,57 +1,80 @@
 ---
-title: 演算法概覽
+title: Algorithms
 tags: [algorithms, computer-science]
 created: 2026-05-03
 updated: 2026-05-08
 ---
 
-# 演算法概覽
+# Algorithms
 
-回到 [[index]]
+Back to [[index]].
 
-## 排序
+Algorithms are repeatable procedures for solving problems. The right choice depends on input size, constraints, and data shape.
+
+## Sorting
 
 ### Quick Sort
 
-平均 O(n log n)，原地排序。
+Quick sort has average O(n log n) runtime and can be implemented compactly in Python.
 
 ```python
-def quicksort(arr):
-    if len(arr) <= 1:
-        return arr
-    pivot = arr[len(arr) // 2]
-    left = [x for x in arr if x < pivot]
-    mid  = [x for x in arr if x == pivot]
-    right = [x for x in arr if x > pivot]
+def quicksort(items):
+    if len(items) <= 1:
+        return items
+    pivot = items[len(items) // 2]
+    left = [x for x in items if x < pivot]
+    mid = [x for x in items if x == pivot]
+    right = [x for x in items if x > pivot]
     return quicksort(left) + mid + quicksort(right)
 ```
 
-> 需要了解 list comprehension 語法，見 [[python-basics#List Comprehension]]。
+This example uses list comprehension from [[python-basics#List Comprehension]].
 
-## 搜尋
+## Searching
 
 ### Binary Search
 
-需要已排序的序列，O(log n)。
+Binary search works on sorted sequences and runs in O(log n).
 
 ```python
-def binary_search(arr, target):
-    lo, hi = 0, len(arr) - 1
-    while lo <= hi:
-        mid = (lo + hi) // 2
-        if arr[mid] == target:
+def binary_search(items, target):
+    low, high = 0, len(items) - 1
+    while low <= high:
+        mid = (low + high) // 2
+        if items[mid] == target:
             return mid
-        elif arr[mid] < target:
-            lo = mid + 1
+        if items[mid] < target:
+            low = mid + 1
         else:
-            hi = mid - 1
+            high = mid - 1
     return -1
 ```
 
-使用 [[data-structures#Hash Table]] 也可達到 O(1) 平均查詢。
+For repeated lookup by key, a [[data-structures#Hash Table]] is usually simpler.
 
-## 相關筆記
+## Graph Traversal
 
-- [[data-structures]] - 演算法依賴的底層結構
-- [[python-basics]] - Python 實作細節
-- [[projects/todo-app]] - 實際應用範例
+Graphs can be traversed with depth-first search or breadth-first search.
+
+```python
+def walk(start, neighbors):
+    seen = {start}
+    stack = [start]
+    while stack:
+        node = stack.pop()
+        for nxt in neighbors(node):
+            if nxt not in seen:
+                seen.add(nxt)
+                stack.append(nxt)
+    return seen
+```
+
+This traversal model is useful for [[projects/notes-indexer]] and for the graph tree view.
+
+## Related Notes
+
+- [[data-structures]] - Containers used by algorithms
+- [[concepts/complexity]] - Runtime and memory analysis
+- [[python-basics]] - Python implementation details
+- [[projects/todo-app]] - Sorting tasks by priority
+- [[projects/notes-indexer]] - Traversing note links

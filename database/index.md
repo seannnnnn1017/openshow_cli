@@ -1,21 +1,37 @@
 ---
-title: 索引
+title: Knowledge Base Index
 tags: [index, home]
 created: 2026-05-08
 ---
 
-# 索引
+# Knowledge Base Index
 
-這是知識庫的入口。
+This small vault is a sample workspace for testing navigation, search, backlinks, and graph views.
 
-## 主要主題
+## Core Topics
 
-- [[python-basics]] - Python 基礎語法
-- [[data-structures]] - 資料結構筆記
-- [[algorithms]] - 演算法概覽
-- [[projects/todo-app]] - 待辦事項專案
+- [[python-basics]] - Python syntax, functions, modules, and file handling
+- [[data-structures]] - Lists, dictionaries, stacks, queues, trees, and graphs
+- [[algorithms]] - Sorting, searching, traversal, and complexity notes
+- [[concepts/complexity]] - Big-O notation and practical tradeoffs
+- [[concepts/testing]] - Testing strategy for small Python tools
 
-## 最近更新
+## Projects
 
-- [[python-basics]] - 新增 list comprehension 範例
-- [[data-structures]] - 補充 hash table 說明
+- [[projects/todo-app]] - A CLI task manager built with Python
+- [[projects/notes-indexer]] - A markdown note indexer with search and backlinks
+- [[demo_project/graph-center]] - A purpose-built graph viewer demo with two layers on both sides
+- [[live-update-long-note]] - A long note for testing automatic refresh
+
+## Patterns
+
+- [[patterns/cli-design]] - Command-line interface design patterns
+- [[patterns/error-handling]] - Error handling and validation patterns
+- [[patterns/refactoring]] - Refactoring notes for small codebases
+
+## Suggested Reading Paths
+
+1. Start with [[python-basics]].
+2. Review [[data-structures]] before reading [[algorithms]].
+3. Use [[concepts/complexity]] to compare implementation choices.
+4. Apply the concepts in [[projects/todo-app]] or [[projects/notes-indexer]].

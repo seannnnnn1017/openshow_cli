@@ -1,0 +1,25 @@
+{
+  "name": "showmd",
+  "version": "0.1.0",
+  "description": "A terminal markdown vault viewer with wiki links, live refresh, themes, and graph navigation.",
+  "bin": {
+    "showmd": "bin/showmd.js"
+  },
+  "files": [
+    "bin/showmd.js",
+    "obsidian_cli.py",
+    "README.md"
+  ],
+  "keywords": [
+    "markdown",
+    "terminal",
+    "curses",
+    "notes",
+    "wiki-links",
+    "graph"
+  ],
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=16"
+  }
+}

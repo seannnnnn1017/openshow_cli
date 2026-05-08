@@ -1,41 +1,64 @@
 ---
-title: 資料結構筆記
+title: Data Structures
 tags: [data-structures, computer-science]
 created: 2026-05-02
 updated: 2026-05-08
 ---
 
-# 資料結構筆記
+# Data Structures
 
-回到 [[index]]
+Back to [[index]].
 
-## 線性結構
+Data structures organize values so programs can access, update, and traverse information efficiently.
 
-| 結構 | 存取 | 插入 | 刪除 |
-|------|------|------|------|
-| Array | O(1) | O(n) | O(n) |
-| Linked List | O(n) | O(1) | O(1) |
-| Stack | O(n) | O(1) | O(1) |
-| Queue | O(n) | O(1) | O(1) |
+## Linear Structures
+
+| Structure | Access | Insert | Delete | Common Use |
+|-----------|--------|--------|--------|------------|
+| Array | O(1) | O(n) | O(n) | Indexed sequences |
+| Linked List | O(n) | O(1) | O(1) | Frequent local insertion |
+| Stack | O(n) | O(1) | O(1) | Undo, parsing, DFS |
+| Queue | O(n) | O(1) | O(1) | Scheduling, BFS |
+
+Stacks and queues appear in [[algorithms#Graph Traversal]].
 
 ## Hash Table
 
-以 key-value 儲存，平均存取 O(1)。
+A hash table stores key-value pairs. Average lookup is O(1), assuming a good hash function and manageable collisions.
 
 ```python
 cache = {}
-cache["key"] = "value"
-print(cache.get("key", "default"))
+cache["note.md"] = {"title": "Note", "links": []}
+print(cache.get("note.md", {}))
 ```
 
-> 在 [[algorithms]] 的搜尋章節有使用 hash table 加速的範例。
+Hash tables are used by [[projects/notes-indexer]] to resolve links quickly.
 
-## 樹狀結構
+## Trees
 
-- Binary Search Tree - 查詢 O(log n)
-- Heap - 優先佇列，常見於 [[algorithms#排序|排序演算法]]
+Trees represent parent-child relationships:
 
-## 相關筆記
+- File trees
+- Abstract syntax trees
+- Search trees
+- Hierarchical menus
 
-- [[python-basics]] - Python 內建資料結構語法
-- [[algorithms]] - 資料結構的應用
+The navigation pane in this project is a tree, while [[patterns/cli-design]] explains how users move through it.
+
+## Graphs
+
+A graph contains nodes and edges. Markdown notes form a graph when one note links to another.
+
+- Nodes: notes
+- Edges: wiki links
+- Incoming edges: backlinks
+- Outgoing edges: links
+
+The graph viewer uses concepts from [[algorithms#Graph Traversal]] and [[concepts/complexity]].
+
+## Related Notes
+
+- [[python-basics]] - Python container syntax
+- [[algorithms]] - Traversal and search over data structures
+- [[concepts/complexity]] - Comparing runtime and memory costs
+- [[projects/notes-indexer]] - Practical graph-like note indexing
