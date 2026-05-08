@@ -2029,11 +2029,17 @@ class App:
                 self.edit_x = visual_x_to_char_index(self.edit_lines[line_index], target_vx)
         else:
             if button & curses.BUTTON4_PRESSED:
-                self.focus = "viewer"
-                self.scroll_viewer(-3)
+                if self.search_hits:
+                    self.find_prev()
+                else:
+                    self.focus = "viewer"
+                    self.scroll_viewer(-3)
             elif button & curses.BUTTON5_PRESSED:
-                self.focus = "viewer"
-                self.scroll_viewer(3)
+                if self.search_hits:
+                    self.find_next()
+                else:
+                    self.focus = "viewer"
+                    self.scroll_viewer(3)
             elif button & curses.BUTTON1_CLICKED and y > 0:
                 self.focus = "viewer"
                 line_index = self.view_scroll + y - 1
