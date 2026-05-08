@@ -1711,7 +1711,7 @@ class App:
         safe_addstr(self.stdscr, top + height - 1, left, help_text[: max(1, width - 1)], curses.A_DIM | viewer_bg)
 
     def draw_status(self, y: int, width: int) -> None:
-        mode = self.mode.upper()
+        mode = "SEARCH" if self.search_hits else self.mode.upper()
         current = self.current.rel if self.current else "-"
         msg = f" {mode} | {current} | {self.theme.label} | {self.status}"
         safe_addstr(self.stdscr, y, 0, msg[: width - 1].ljust(width - 1), curses.A_REVERSE)
