@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from obsidian_cli import Note, RenderLine, collect_search_hits
+from openshow import Note, RenderLine, collect_search_hits
 
 
 def _render(raw: str) -> list[RenderLine]:

@@ -1,6 +1,6 @@
 # Links
 
-ShowMD resolves wiki links by relative path or file stem.
+OpenShow resolves wiki links by relative path or file stem.
 
 Try these:
 

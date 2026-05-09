@@ -1,13 +1,13 @@
 {
-  "name": "showmd",
+  "name": "openshow",
   "version": "0.1.0",
   "description": "A terminal markdown vault viewer with wiki links, live refresh, themes, and graph navigation.",
   "bin": {
-    "showmd": "bin/showmd.js"
+    "openshow": "bin/openshow.js"
   },
   "files": [
-    "bin/showmd.js",
-    "obsidian_cli.py",
+    "bin/openshow.js",
+    "openshow",
     "README.md"
   ],
   "keywords": [

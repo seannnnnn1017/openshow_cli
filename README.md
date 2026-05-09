@@ -1,8 +1,8 @@
-# ShowMD
+# OpenShow
 
-ShowMD is a terminal document viewer for browsing Markdown vaults, text files, code files, and notebooks with wiki links, backlinks, themes, live refresh, editing, and graph navigation.
+OpenShow is a terminal document viewer for browsing Markdown vaults, text files, code files, and notebooks with wiki links, backlinks, themes, live refresh, editing, and graph navigation.
 
-It is designed for small Markdown knowledge bases and Obsidian-style folders, while staying lightweight enough to run as a single Python curses application.
+It is designed for small Markdown knowledge bases and Obsidian-style folders, while staying lightweight enough to run as a small Python curses package.
 
 ## Features
 
@@ -16,7 +16,7 @@ It is designed for small Markdown knowledge bases and Obsidian-style folders, wh
 - Auto-refresh when supported documents are changed externally
 - Switch themes from an in-app tab selector
 - Use one-level and two-level graph views centered on the current document
-- Install as a terminal command named `showmd`
+- Install as a terminal command named `openshow`
 
 ## Requirements
 
@@ -39,7 +39,7 @@ npm install -g .
 Then run:
 
 ```bash
-showmd
+openshow
 ```
 
 The npm package is a thin wrapper around the Python app. It avoids Python package installation issues on Debian/Ubuntu systems with externally managed Python environments.
@@ -48,7 +48,7 @@ The npm package is a thin wrapper around the Python app. It avoids Python packag
 
 ```bash
 pipx install -e .
-showmd
+openshow
 ```
 
 ### Python editable install
@@ -59,13 +59,13 @@ Use this inside a virtual environment:
 python3 -m venv .venv
 . .venv/bin/activate
 python -m pip install -e .
-showmd
+openshow
 ```
 
 ### Development without install
 
 ```bash
-python3 obsidian_cli.py database
+python3 -m openshow database
 ```
 
 ## Usage
@@ -73,36 +73,36 @@ python3 obsidian_cli.py database
 Open the current directory:
 
 ```bash
-showmd
+openshow
 ```
 
 Open the bundled mixed-document demo:
 
 ```bash
-showmd demo
+openshow demo
 ```
 
 Open another Markdown vault:
 
 ```bash
-showmd /path/to/your/vault
+openshow /path/to/your/vault
 ```
 
 Open a single file directly:
 
 ```bash
-showmd README.md
-showmd notes.txt
-showmd app.py
-showmd analysis.ipynb
+openshow README.md
+openshow notes.txt
+openshow app.py
+openshow analysis.ipynb
 ```
 
 Start with a specific theme:
 
 ```bash
-showmd database --theme graphite
-showmd database --theme transparent
-showmd database --theme ink
+openshow database --theme graphite
+openshow database --theme transparent
+openshow database --theme ink
 ```
 
 The default theme is `transparent`.
@@ -129,7 +129,7 @@ Mouse support is available for opening notes, following visible wiki links, scro
 
 ## Markdown Links
 
-ShowMD supports common Obsidian-style wiki links:
+OpenShow supports common Obsidian-style wiki links:
 
 ```markdown
 [[python-basics]]
@@ -141,7 +141,7 @@ Links are resolved by note stem or relative path. For example, `[[python-basics]
 
 ## Graph Views
 
-ShowMD includes two graph views centered on the current note.
+OpenShow includes two graph views centered on the current note.
 
 ### One-Level Graph
 
@@ -168,11 +168,11 @@ The `demo/` folder is a smaller mixed-document workspace with Markdown, Python, 
 
 ## Live Refresh
 
-ShowMD checks the opened directory or file for external changes once per second. The check is intentionally lightweight: it only compares each supported document's relative path, modification timestamp, and file size.
+OpenShow checks the opened directory or file for external changes once per second. The check is intentionally lightweight: it only compares each supported document's relative path, modification timestamp, and file size.
 
-When a change is detected, ShowMD reloads the document set, refreshes the sidebar, updates links and backlinks, and re-renders the current document if it still exists.
+When a change is detected, OpenShow reloads the document set, refreshes the sidebar, updates links and backlinks, and re-renders the current document if it still exists.
 
-Live refresh is paused while editing inside ShowMD to avoid disrupting unsaved changes.
+Live refresh is paused while editing inside OpenShow to avoid disrupting unsaved changes.
 
 ## Themes
 
@@ -198,17 +198,17 @@ The `database/` directory contains an English sample vault with:
 Run it with:
 
 ```bash
-showmd demo
+openshow demo
 ```
 
 ## Packaging
 
 This repository supports both npm and Python packaging:
 
-- `package.json` exposes `showmd` through `bin/showmd.js`
-- `pyproject.toml` exposes `showmd = obsidian_cli:main`
+- `package.json` exposes `openshow` through `bin/openshow.js`
+- `pyproject.toml` exposes `openshow = openshow.cli:main`
 
-The core application remains in `obsidian_cli.py`.
+The Python application is split across the `openshow/` package so document loading, search, terminal helpers, themes, and CLI startup can be tested and maintained independently.
 
 ## Tests
 
@@ -221,7 +221,7 @@ python3 -m pytest
 Run a syntax check:
 
 ```bash
-python3 -m py_compile obsidian_cli.py
+python3 -m compileall openshow
 ```
 
 ## License

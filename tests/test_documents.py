@@ -1,6 +1,6 @@
 import json
 
-from obsidian_cli import Vault, notebook_to_markdown, read_document
+from openshow import Vault, notebook_to_markdown, read_document
 
 
 def test_vault_scans_markdown_text_code_and_notebooks(tmp_path):

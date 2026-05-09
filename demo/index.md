@@ -1,6 +1,6 @@
-# ShowMD Demo
+# OpenShow Demo
 
-This folder is a small mixed-document workspace for testing `showmd demo`.
+This folder is a small mixed-document workspace for testing `openshow demo`.
 
 Open the linked files from the sidebar or with wiki links:
 

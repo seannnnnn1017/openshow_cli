@@ -1,8 +1,8 @@
-ShowMD plain text demo
+OpenShow plain text demo
 
 This file is not Markdown. It should still open in the viewer when browsing
 the demo directory or when running:
 
-showmd demo/text/sample.txt
+openshow demo/text/sample.txt
 
-Plain text files are editable in ShowMD.
+Plain text files are editable in OpenShow.

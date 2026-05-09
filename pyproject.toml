@@ -3,13 +3,13 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "showmd"
+name = "openshow"
 version = "0.1.0"
 description = "A terminal markdown vault viewer with wiki links, live refresh, themes, and graph navigation."
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [
-  { name = "showmd contributors" }
+  { name = "openshow contributors" }
 ]
 classifiers = [
   "Environment :: Console :: Curses",
@@ -23,7 +23,7 @@ classifiers = [
 ]
 
 [project.scripts]
-showmd = "obsidian_cli:main"
+openshow = "openshow.cli:main"
 
 [tool.setuptools]
-py-modules = ["obsidian_cli"]
+packages = ["openshow"]
