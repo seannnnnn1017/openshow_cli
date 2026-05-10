@@ -2,7 +2,7 @@
 import curses
 import time
 from pathlib import Path
-
+import re
 from .constants import CTRL_E, CTRL_F, CTRL_G, CTRL_S, CTRL_T, ESC, HEADING_RE, HR_RE, VAULT_POLL_SECONDS, WIKI_LINK_RE
 from .documents import Vault, read_document, read_text_document, split_frontmatter
 from .models import Note, RenderLine, RenderLink, Theme, TreeItem
