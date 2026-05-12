@@ -4,6 +4,21 @@ OpenShow is a terminal document viewer for browsing Markdown vaults, text files,
 
 It is designed for small Markdown knowledge bases and Obsidian-style folders, while staying lightweight enough to run as a small Python curses package.
 
+## Preview
+
+![Full screen view](readme_images/full%20screen.png)
+
+<table>
+<tr>
+<td><img src="readme_images/showipynb.png" alt="Jupyter notebook view"></td>
+<td><img src="readme_images/showgraphlink.png" alt="Graph link view"></td>
+</tr>
+<tr>
+<td><img src="readme_images/differenttheme.png" alt="Different themes"></td>
+<td><img src="readme_images/file%20tab.png" alt="File tab view"></td>
+</tr>
+</table>
+
 ## Features
 
 - Browse a Markdown vault or a general document directory with a tree-style sidebar
